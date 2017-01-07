@@ -37,12 +37,12 @@ def client_handler(client_sock):
                 break
             else:
                 file_buffer += data
-         try:
-             with open(upload_dest, 'wb') as fd:
-                 fd.write(file_buffer)
-             client_sock.send('succesfully save file to %s\r\n' % upload_dest)
-         except:
-             client_sock.send('failed to save file to %s\r\n' % upload_dest)
+        try:
+            with open(upload_dest, 'wb') as fd:
+                fd.write(file_buffer)
+            client_sock.send('succesfully save file to %s\r\n' % upload_dest)
+        except:
+            client_sock.send('failed to save file to %s\r\n' % upload_dest)
 
     if len(execute):
         output = run_command(execute)
