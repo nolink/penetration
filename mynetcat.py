@@ -5,6 +5,7 @@ import getopt
 import os
 import sys
 import socket
+import subprocess
 import threading
 
 target = None
@@ -15,14 +16,15 @@ execute = ''
 upload_dest = ''
 
 def usage():
-    print './mynetcat.py -t localhost -p 80 -l -c ls -u -e'
+    print './mynetcat.py -t localhost -p 80 -l -c -u xx -e xx'
    
-def run_command(command):
-    command = command.rstrip()
+def run_command(cmd_str):
+    cmd_str = cmd_str.rstrip()
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell = True)
+        output = subprocess.check_output(cmd_str, stderr=subprocess.STDOUT, shell = True)
     except:
         output = "failed"
+    return output
  
 def client_handler(client_sock):
     global upload
@@ -53,7 +55,7 @@ def client_handler(client_sock):
             client_sock.send("<MYNETCAT:#>")
             cmd_buffer = ""
             while "\n" not in cmd_buffer:
-                cmd_buffer += client.recv(1024)
+                cmd_buffer += client_sock.recv(1024)
             resp = run_command(cmd_buffer)
             client_sock.send(resp)
              
@@ -86,7 +88,7 @@ def client_sender(buffer):
             recv_len = 1
             resp = ""
             while recv_len:
-                data = client.recv(4096)
+                data = sock.recv(4096)
                 recv_len = len(data)
                 resp += data
                 if recv_len < 4096:
@@ -100,7 +102,7 @@ def client_sender(buffer):
         sock.close()    
 
 def main():
-    opts, _ = getopt.getopt(sys.argv[1:], 'hlt:p:c:u:e', longopts=['help', 'listen', 'target', 'port', 'command','upload', 'execute'])
+    opts, _ = getopt.getopt(sys.argv[1:], 'hlt:p:u:e:c', longopts=['help', 'listen', 'target', 'port', 'command','upload', 'execute'])
     global target
     global port
     global listen
